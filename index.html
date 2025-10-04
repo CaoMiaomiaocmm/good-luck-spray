@@ -1,19 +1,545 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>好运喷雾 ✨</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Arial', sans-serif;
-            overflow-x: hidden;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-            background-size: 400% 400%;
-            animation: gradientShift 15s ease infinite;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            padding: 20px;
-        }
-        @keyframes
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>好运喷雾 ✨</title>
+  <style>
+    :root{
+      --txt:#ffffff; --sub:rgba(255,255,255,.9);
+      --panel:rgba(255,255,255,.15); --panel-strong:rgba(255,255,255,.25);
+      --border:rgba(255,255,255,.3);
+    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{
+      font-family:'Arial',sans-serif;overflow-x:hidden;min-height:100vh;
+      background:linear-gradient(135deg,#667eea 0%,#764ba2 50%,#f093fb 100%);
+      background-size:400% 400%;animation:gradientShift 15s ease infinite;
+      display:flex;flex-direction:column;justify-content:center;align-items:center;padding:20px;color:var(--txt);
+    }
+    @keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+    .container{ text-align:center; max-width:1200px; width:100% }
+    .title{ font-size:48px; text-shadow:0 0 20px rgba(255,255,255,.5); margin-bottom:10px; font-weight:bold }
+    .subtitle{ opacity:.95; margin-bottom:16px }
+    .fairy{ font-size:120px; animation:float 3s ease-in-out infinite; cursor:pointer; transition:transform .3s; user-select:none }
+    .fairy:hover{ transform:scale(1.1) }
+    .fairy.spraying{ animation:spray .5s ease-out }
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-20px)}}
+    @keyframes spray{0%{transform:scale(1) rotate(0)}50%{transform:scale(1.2) rotate(-10deg)}100%{transform:scale(1) rotate(0)}}
+    .spray-button,.btn{
+      margin-top:12px; padding:12px 26px; font-size:16px; background:linear-gradient(135deg,#f093fb 0%,#f5576c 100%);
+      border:none;border-radius:50px;color:#fff;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,.3);transition:all .3s;font-weight:bold;
+    }
+    .spray-button:hover,.btn:hover{ transform:translateY(-2px); box-shadow:0 15px 40px rgba(0,0,0,.4) }
+
+    .blessing-text{
+      position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+      font-size:32px; color:#fff; text-shadow:0 0 20px rgba(255,255,255,.8);
+      opacity:0; pointer-events:none; font-weight:bold; white-space:nowrap; z-index:100
+    }
+    .blessing-text.show{ animation:blessAppear 3s ease-out forwards }
+    @keyframes blessAppear{0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}20%{opacity:1;transform:translate(-50%,-50%) scale(1.2)}80%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-50%) scale(1)}}
+
+    .particle{ position:fixed; pointer-events:none; font-size:24px; animation:particleFly 2s ease-out forwards; z-index:99 }
+    @keyframes particleFly{0%{opacity:1; transform:translate(0,0) scale(0)}50%{opacity:1; transform:translate(var(--tx),var(--ty)) scale(1)}100%{opacity:0; transform:translate(calc(var(--tx)*1.5), calc(var(--ty)*2)) scale(.5)}}
+
+    .features-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(240px,1fr)); gap:16px; margin-top:24px; max-width:1200px }
+    .feature-card{ background:var(--panel); backdrop-filter:blur(10px); border-radius:16px; padding:18px; border:2px solid var(--border); cursor:pointer; transition:all .25s; text-align:center }
+    .feature-card:hover{ transform:translateY(-5px); background:var(--panel-strong); box-shadow:0 10px 30px rgba(0,0,0,.25) }
+    .feature-icon{ font-size:48px; margin-bottom:10px }
+    .feature-title{ font-size:18px; font-weight:bold; margin-bottom:6px }
+    .feature-desc{ color:var(--sub); font-size:13px }
+
+    .modal{ display:none; position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:200; justify-content:center; align-items:center; padding:20px }
+    .modal.active{ display:flex }
+    .modal-content{
+      background:linear-gradient(135deg,#667eea 0%, #764ba2 100%);
+      border-radius:24px; padding:28px; max-width:560px; width:100%;
+      border:3px solid rgba(255,255,255,.4); box-shadow:0 20px 60px rgba(0,0,0,.5);
+      text-align:center; position:relative; animation:modalAppear .25s ease-out
+    }
+    @keyframes modalAppear{from{opacity:0; transform:scale(.9)} to{opacity:1; transform:scale(1)}}
+    .close-modal{ position:absolute; top:12px; right:16px; font-size:26px; color:#fff; cursor:pointer; line-height:1 }
+    .modal-title{ font-size:24px; margin-bottom:16px; font-weight:bold }
+    .fortune-card{ background:rgba(255,255,255,.2); backdrop-filter:blur(10px); border-radius:16px; padding:22px; margin:14px 0; border:2px solid rgba(255,255,255,.3) }
+    .fortune-result{ font-size:52px; margin-bottom:14px }
+    .fortune-text{ font-size:20px; font-weight:bold; margin-bottom:10px }
+    .fortune-detail{ color:#fff; font-size:15px; line-height:1.6 }
+
+    .lucky-number-display{ display:flex; justify-content:center; gap:12px; margin:18px 0; flex-wrap:wrap }
+    .lucky-number{ width:56px; height:56px; background:linear-gradient(135deg,#f093fb 0%, #f5576c 100%); border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-size:22px; font-weight:bold; box-shadow:0 5px 15px rgba(0,0,0,.3); animation:numberPop .5s ease-out }
+    @keyframes numberPop{0%{transform:scale(0) rotate(0)}50%{transform:scale(1.2) rotate(180deg)}100%{transform:scale(1) rotate(360deg)}}
+
+    .coins-container{ display:flex; justify-content:center; gap:16px; margin:16px 0; flex-wrap:wrap }
+    .coin{ width:80px; height:80px; background:linear-gradient(135deg,#ffd700 0%, #ffed4e 100%); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:40px; cursor:pointer; transition:all .3s; box-shadow:0 5px 20px rgba(255,215,0,.5); border:3px solid #fff }
+    .coin:hover{ transform:scale(1.1) rotate(10deg) }
+    .coin.flipping{ animation:coinFlip 1s ease-in-out }
+    @keyframes coinFlip{0%{transform:rotateY(0)}100%{transform:rotateY(1080deg)}}
+
+    .energy-bar{ width:100%; height:28px; background:rgba(255,255,255,.2); border-radius:14px; overflow:hidden; margin:16px 0; border:2px solid rgba(255,255,255,.3) }
+    .energy-fill{ height:100%; background:linear-gradient(90deg,#4facfe 0%, #00f2fe 100%); transition:width .5s ease; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold }
+
+    .tarot-cards{ display:flex; justify-content:center; gap:14px; margin:14px 0; flex-wrap:wrap }
+    .tarot-card{ width:96px; height:152px; background:linear-gradient(135deg,#667eea 0%, #764ba2 100%); border-radius:10px; cursor:pointer; transition:all .3s; display:flex; align-items:center; justify-content:center; font-size:44px; border:3px solid rgba(255,255,255,.5); box-shadow:0 5px 20px rgba(0,0,0,.3); position:relative }
+    .tarot-card:hover{ transform:translateY(-8px) }
+    .tarot-card.flipped{ animation:cardFlip .6s ease-in-out }
+    @keyframes cardFlip{0%,100%{transform:rotateY(0)}50%{transform:rotateY(180deg)}}
+
+    footer{ margin-top: 16px; opacity:.9; font-size: 13px }
+
+    @media (max-width:768px){
+      .fairy{font-size:80px}
+      .title{font-size:36px}
+      .spray-button{font-size:18px;padding:12px 30px}
+      .blessing-text{font-size:20px;white-space:normal;max-width:90%}
+      .features-grid{grid-template-columns:1fr}
+      .modal-content{padding:24px 18px}
+      .fortune-result{font-size:46px}
+      .fortune-text{font-size:18px}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="title">✨ 好运喷雾 ✨</h1>
+    <div class="subtitle">喷一喷 → 收一份好运；数据保存在本地浏览器中 ✅</div>
+    <div class="fairy" id="fairy">🧚‍♀️</div>
+    <button class="spray-button" id="sprayBtn">喷洒好运 ✨</button>
+
+    <div class="features-grid">
+      <div class="feature-card" onclick="openFortuneModal()">
+        <div class="feature-icon">🔮</div>
+        <div class="feature-title">今日运势</div>
+        <div class="feature-desc">抽取今天的运势签，看看运气如何</div>
+      </div>
+      <div class="feature-card" onclick="openLuckyNumberModal()">
+        <div class="feature-icon">🎰</div>
+        <div class="feature-title">幸运数字</div>
+        <div class="feature-desc">生成你的专属幸运数字</div>
+      </div>
+      <div class="feature-card" onclick="openCoinModal()">
+        <div class="feature-icon">🪙</div>
+        <div class="feature-title">抛硬币决策</div>
+        <div class="feature-desc">让命运帮你做选择</div>
+      </div>
+      <div class="feature-card" onclick="openTarotModal()">
+        <div class="feature-icon">🃏</div>
+        <div class="feature-title">塔罗占卜</div>
+        <div class="feature-desc">抽取塔罗牌指引方向（含逆位）</div>
+      </div>
+      <div class="feature-card" onclick="openEnergyModal()">
+        <div class="feature-icon">⚡</div>
+        <div class="feature-title">能量充能</div>
+        <div class="feature-desc">为自己注入正能量</div>
+      </div>
+      <div class="feature-card" onclick="openWishModal()">
+        <div class="feature-icon">🌠</div>
+        <div class="feature-title">许愿池</div>
+        <div class="feature-desc">写下愿望，让它成真</div>
+      </div>
+      <div class="feature-card" onclick="openZodiacModal()">
+        <div class="feature-icon">♈</div>
+        <div class="feature-title">星座/生肖加成</div>
+        <div class="feature-desc">选择后为结果做“轻微加权”</div>
+      </div>
+      <div class="feature-card" onclick="openPosterModal()">
+        <div class="feature-icon">🖼️</div>
+        <div class="feature-title">导出海报</div>
+        <div class="feature-desc">把今日结果生成一张分享图</div>
+      </div>
+    </div>
+
+    <footer>若需要自定义文案或样式，直接改本文件即可～</footer>
+  </div>
+
+  <div class="blessing-text" id="blessingText"></div>
+
+  <!-- 今日运势 -->
+  <div class="modal" id="fortuneModal">
+    <div class="modal-content">
+      <span class="close-modal" onclick="closeModal('fortuneModal')">×</span>
+      <div class="modal-title">🔮 今日运势</div>
+      <div class="fortune-card" id="fortuneCard" style="display:none;">
+        <div class="fortune-result" id="fortuneEmoji"></div>
+        <div class="fortune-text" id="fortuneLevel"></div>
+        <div class="fortune-detail" id="fortuneDetail"></div>
+      </div>
+      <button class="btn" onclick="drawFortune()">抽取运势</button>
+    </div>
+  </div>
+
+  <!-- 幸运数字 -->
+  <div class="modal" id="luckyNumberModal">
+    <div class="modal-content">
+      <span class="close-modal" onclick="closeModal('luckyNumberModal')">×</span>
+      <div class="modal-title">🎰 幸运数字</div>
+      <div class="lucky-number-display" id="luckyNumbers"></div>
+      <div id="luckyExtra" class="fortune-detail" style="margin-bottom:10px;"></div>
+      <button class="btn" onclick="generateLuckyNumbers()">生成幸运数字</button>
+    </div>
+  </div>
+
+  <!-- 抛硬币 -->
+  <div class="modal" id="coinModal">
+    <div class="modal-content">
+      <span class="close-modal" onclick="closeModal('coinModal')">×</span>
+    <div class="modal-title">🪙 抛硬币决策</div>
+      <div class="coins-container">
+        <div class="coin" onclick="flipCoin(this)">🪙</div>
+      </div>
+      <div class="fortune-text" id="coinResult" style="margin-top:6px;"></div>
+      <div class="fortune-detail">点击硬币进行抛掷</div>
+    </div>
+  </div>
+
+  <!-- 塔罗 -->
+  <div class="modal" id="tarotModal">
+    <div class="modal-content">
+      <span class="close-modal" onclick="closeModal('tarotModal')">×</span>
+      <div class="modal-title">🃏 塔罗占卜</div>
+      <div class="tarot-cards" id="tarotCards"></div>
+      <div class="fortune-card" id="tarotResult" style="display:none; margin-top:10px;">
+        <div class="fortune-result" id="tarotEmoji"></div>
+        <div class="fortune-text" id="tarotTitle"></div>
+        <div class="fortune-detail" id="tarotDetail"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 能量充能 -->
+  <div class="modal" id="energyModal">
+    <div class="modal-content">
+      <span class="close-modal" onclick="closeModal('energyModal')">×</span>
+      <div class="modal-title">⚡ 能量充能</div>
+      <div class="energy-bar">
+        <div class="energy-fill" id="energyFill" style="width:0%">0%</div>
+      </div>
+      <button class="btn" onclick="chargeEnergy()">开始充能</button>
+      <div class="fortune-detail" style="margin-top:8px;">点击按钮为自己注入满满的正能量！</div>
+    </div>
+  </div>
+
+  <!-- 许愿池 -->
+  <div class="modal" id="wishModal">
+    <div class="modal-content">
+      <span class="close-modal" onclick="closeModal('wishModal')">×</span>
+      <div class="modal-title">🌠 许愿池</div>
+      <textarea id="wishText" style="width:100%;height:120px;border-radius:12px;padding:12px;font-size:16px;border:2px solid var(--border);background:var(--panel);resize:none;color:#fff;" placeholder="写下你的愿望..."></textarea>
+      <button class="btn" onclick="makeWish()" style="margin-top:12px;">投入许愿池</button>
+      <div id="wishResult" style="margin-top:12px;font-size:16px;"></div>
+    </div>
+  </div>
+
+  <!-- 星座/生肖 -->
+  <div class="modal" id="zodiacModal">
+    <div class="modal-content">
+      <span class="close-modal" onclick="closeModal('zodiacModal')">×</span>
+      <div class="modal-title">♈ 星座 / 生肖 加成</div>
+      <div class="fortune-card" style="text-align:left; font-size:14px;">
+        <label>星座：
+          <select id="signSel">
+            <option value="">未选择</option>
+            <option>白羊</option><option>金牛</option><option>双子</option><option>巨蟹</option>
+            <option>狮子</option><option>处女</option><option>天秤</option><option>天蝎</option>
+            <option>射手</option><option>摩羯</option><option>水瓶</option><option>双鱼</option>
+          </select>
+        </label>
+        <br/>
+        <label>生肖：
+          <select id="zodiacSel">
+            <option value="">未选择</option>
+            <option>鼠</option><option>牛</option><option>虎</option><option>兔</option>
+            <option>龙</option><option>蛇</option><option>马</option><option>羊</option>
+            <option>猴</option><option>鸡</option><option>狗</option><option>猪</option>
+          </select>
+        </label>
+      </div>
+      <button class="btn" onclick="saveProfile()">应用加成</button>
+      <div class="fortune-detail" style="margin-top:8px;">加成将轻微影响“运势/幸运数字/幸运色”。</div>
+    </div>
+  </div>
+
+  <!-- 导出海报 -->
+  <div class="modal" id="posterModal">
+    <div class="modal-content">
+      <span class="close-modal" onclick="closeModal('posterModal')">×</span>
+      <div class="modal-title">🖼️ 导出海报</div>
+      <canvas id="posterCanvas" width="864" height="1536" style="width:270px;height:480px;border-radius:12px;border:2px solid var(--border);"></canvas>
+      <div class="fortune-detail" style="margin:10px 0;">将当前“运势/幸运色/愿望”合成 PNG 图片</div>
+      <button class="btn" onclick="renderPoster()">生成海报</button>
+      <button class="btn" onclick="downloadPoster()" style="margin-left:8px;">保存 PNG</button>
+    </div>
+  </div>
+
+  <script>
+    // ===== 文案与数据 =====
+    const defaultBlessings = [
+      "今天一定会超级顺利！✨","好运正在靠近你 💫","你值得被温柔对待 💕","幸福会在不经意间降临 🌸",
+      "所有美好都会如期而至 🌈","今天的你闪闪发光 ⭐","愿你被世界温柔以待 🌺","好事即将发生 🎉",
+      "你的笑容会带来好运 😊","心想事成，万事如意 🎊","美好的事情正在路上 🦋","你会收到意外的惊喜 🎁",
+      "今天遇到的都是好人 💖","运气爆棚的一天开始了 🌟","所有难题都会迎刃而解 💪","幸运女神在对你微笑 😇",
+      "把复杂留给昨天，把好运留给今天 ✨","宇宙正在悄悄偏爱你 🌌","小小的坚持也会发光 🔆","愿一切如你所愿 🪄"
+    ];
+    let blessings = defaultBlessings.slice();
+
+    const emojis = ['✨','💫','🌟','🌸','💖','🍀','🦋','🎈','🌈','⭐'];
+    const directions = ['正东','东南','正南','西南','正西','西北','正北','东北'];
+    const colors = ['樱花粉','薄荷绿','天青蓝','柠檬黄','薰衣草紫','珊瑚橙','奶油白','宝石蓝','祖母绿','石英粉'];
+    const zodiacPrefColors = { 龙:['宝石蓝','祖母绿'], 虎:['珊瑚橙','柠檬黄'], 马:['樱花粉','奶油白'], 狗:['天青蓝','石英粉'] };
+
+    const tarotData = [
+      { name:"愚者", emoji:"🧭", detail:"新的旅程、自由、信任直觉。" },
+      { name:"魔术师", emoji:"🪄", detail:"资源与意志力齐备，开始创造。" },
+      { name:"女祭司", emoji:"🌙", detail:"倾听内心与直觉，保持神秘。" },
+      { name:"皇后", emoji:"🌿", detail:"丰饶、滋养、艺术与享受。" },
+      { name:"皇帝", emoji:"🏛️", detail:"秩序、结构、权威与担当。" },
+      { name:"教皇", emoji:"📜", detail:"传统、学习与精神指引。" },
+      { name:"恋人", emoji:"💕", detail:"亲密、选择、价值观的一致。" },
+      { name:"战车", emoji:"🛡️", detail:"意志与胜利，稳住方向。" },
+      { name:"力量", emoji:"💪", detail:"温柔的勇气与自我掌控。" },
+      { name:"隐者", emoji:"🕯️", detail:"独处思考，寻找真理之灯。" },
+      { name:"命运之轮", emoji:"🎡", detail:"周期变化，抓住转机。" },
+      { name:"正义", emoji:"⚖️", detail:"公平、因果、理性抉择。" },
+      { name:"倒吊人", emoji:"🪢", detail:"换个视角，暂缓行动。" },
+      { name:"死亡", emoji:"🦂", detail:"结束即开始，果断割舍。" },
+      { name:"节制", emoji:"💧", detail:"平衡与调和，掌握节奏。" },
+      { name:"恶魔", emoji:"🪤", detail:"警惕诱惑，松开执念。" },
+      { name:"高塔", emoji:"⚡", detail:"突变与重建，打破旧框架。" },
+      { name:"星星", emoji:"⭐", detail:"希望与疗愈，光照前路。" },
+      { name:"月亮", emoji:"🌙", detail:"潜意识、梦境、直觉提醒。" },
+      { name:"太阳", emoji:"☀️", detail:"成功、喜悦与童真力量。" },
+      { name:"审判", emoji:"📣", detail:"觉醒、召唤与自我和解。" },
+      { name:"世界", emoji:"🌍", detail:"完成、整合与圆满。" }
+    ];
+
+    const fortunes = [
+      { level:"大吉", emoji:"🌟", base:20, detail:"今天运气爆棚！做什么都会特别顺利，是实现愿望的好日子！" },
+      { level:"中吉", emoji:"✨", base:16, detail:"运势不错，会有小惊喜出现，保持积极心态会更好！" },
+      { level:"小吉", emoji:"🍀", base:12, detail:"平稳的一天，踏实做事会有好结果，适合稳步前进。" },
+      { level:"吉",   emoji:"💫", base:10, detail:"整体顺利，偶尔有小波折，但最终都能化解。" },
+      { level:"半吉", emoji:"🌈", base: 8, detail:"运势平平，保持平常心，不要冒险尝试新事物。" },
+      { level:"末吉", emoji:"🌸", base: 6, detail:"需要多加小心，但谨慎行事就没问题。" },
+      { level:"凶转吉", emoji:"🌤️", base:14, detail:"逢凶化吉的一天，先难后易，保持耐心。" }
+    ];
+
+    // ===== 状态（本地存储） =====
+    const LS_KEY = 'lucky_app_v1';
+    let state = {
+      profile: { sign:'', zodiac:'' },
+      last: { fortune:null, luckColor:null, numbers:[], wish:'' }
+    };
+    try { const s = JSON.parse(localStorage.getItem(LS_KEY)); if (s) state = Object.assign(state, s); } catch(e){}
+
+    function saveState(){ localStorage.setItem(LS_KEY, JSON.stringify(state)); }
+
+    // ===== 特效 & 主按钮 =====
+    function createParticles(x,y){
+      const num=30;
+      for(let i=0;i<num;i++){
+        const el=document.createElement('div');
+        el.className='particle';
+        el.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+        const ang=(Math.PI*2*i)/num;
+        const dist=100+Math.random()*200;
+        const tx=Math.cos(ang)*dist, ty=Math.sin(ang)*dist;
+        el.style.left=x+'px'; el.style.top=y+'px';
+        el.style.setProperty('--tx',tx+'px'); el.style.setProperty('--ty',ty+'px');
+        document.body.appendChild(el);
+        setTimeout(()=>el.remove(),2000);
+      }
+    }
+
+    function showBlessing(){
+      const msg = blessings[Math.floor(Math.random()*blessings.length)];
+      const box = document.getElementById('blessingText');
+      box.textContent = msg;
+      box.classList.remove('show'); void box.offsetWidth;
+      box.classList.add('show');
+    }
+
+    function sprayLuck(){
+      const fairy=document.getElementById('fairy');
+      fairy.classList.add('spraying'); setTimeout(()=>fairy.classList.remove('spraying'),500);
+      const r = fairy.getBoundingClientRect();
+      createParticles(r.left + r.width/2, r.top + r.height/2);
+      setTimeout(showBlessing, 200);
+    }
+    document.getElementById('sprayBtn').addEventListener('click',sprayLuck);
+    document.getElementById('fairy').addEventListener('click',sprayLuck);
+
+    // ===== Modal 通用 =====
+    function openModal(id){ document.getElementById(id).classList.add('active'); }
+    function closeModal(id){ document.getElementById(id).classList.remove('active'); }
+
+    // ===== 今日运势（含星座/生肖权重） =====
+    const signBias = { 火:["白羊","狮子","射手"], 土:["金牛","处女","摩羯"], 风:["双子","天秤","水瓶"], 水:["巨蟹","天蝎","双鱼"] };
+    function weightedPickFortune(){
+      let w=[1.3,1.15,1.05,1.0,0.95,0.9,1.1]; // 各等级权重
+      const s=state.profile.sign||'', z=state.profile.zodiac||'';
+      if(signBias.火.includes(s)) w=[1.5,1.2,1.05,1.0,0.95,0.9,1.2];
+      if(signBias.土.includes(s)) w=[1.2,1.1,1.1,1.05,1.0,0.95,1.05];
+      if(signBias.风.includes(s)) w=[1.35,1.2,1.05,1.05,1.0,0.95,1.1];
+      if(signBias.水.includes(s)) w=[1.25,1.15,1.1,1.05,1.0,0.95,1.1];
+      if(['龙','虎','马','狗'].includes(z)) w[0]+=0.15; // 大吉略增
+      const pool = fortunes.flatMap((f,i)=>Array(Math.round(w[i]*10)).fill(i));
+      return fortunes[ pool[Math.floor(Math.random()*pool.length)] ];
+    }
+    function openFortuneModal(){ openModal('fortuneModal'); document.getElementById('fortuneCard').style.display='none'; }
+    function drawFortune(){
+      const f = weightedPickFortune();
+      document.getElementById('fortuneEmoji').textContent = f.emoji;
+      document.getElementById('fortuneLevel').textContent = f.level;
+      document.getElementById('fortuneDetail').textContent = f.detail;
+      document.getElementById('fortuneCard').style.display='block';
+      state.last.fortune = f; saveState();
+    }
+
+    // ===== 幸运数字（随星座微偏置） + 幸运色/方向提示 =====
+    function openLuckyNumberModal(){
+      openModal('luckyNumberModal');
+      document.getElementById('luckyNumbers').innerHTML='';
+      document.getElementById('luckyExtra').textContent='';
+    }
+    function generateLuckyNumbers(){
+      const box=document.getElementById('luckyNumbers'); box.innerHTML='';
+      const set=new Set();
+      const bias = (['白羊','狮子','射手'].includes(state.profile.sign)? 3: ['金牛','处女','摩羯'].includes(state.profile.sign)? 1: 2);
+      while(set.size<6){
+        const r=1+Math.floor(Math.abs(Math.sin(Date.now()+Math.random()*999))*49);
+        const n=((r+bias)%49)+1; set.add(n);
+      }
+      const arr=[...set].sort((a,b)=>a-b);
+      state.last.numbers = arr; saveState();
+      arr.forEach(n=>{ const d=document.createElement('div'); d.className='lucky-number'; d.textContent=n; box.appendChild(d); });
+      // 附加幸运色/方向
+      const pref = zodiacPrefColors[state.profile.zodiac]||[];
+      const palette = pref.length? pref.concat(colors).slice(0,Math.max(6,pref.length+4)) : colors;
+      const color = palette[Math.floor(Math.random()*palette.length)];
+      const dir = directions[Math.floor(Math.random()*directions.length)];
+      state.last.luckColor = {color, dir}; saveState();
+      document.getElementById('luckyExtra').textContent = `幸运色：${color} · 幸运方向：${dir}`;
+    }
+
+    // ===== 抛硬币 =====
+    function openCoinModal(){ openModal('coinModal'); document.getElementById('coinResult').textContent=''; }
+    function flipCoin(el){
+      el.classList.add('flipping');
+      setTimeout(()=>{
+        el.classList.remove('flipping');
+        const heads = Math.random()<0.5;
+        document.getElementById('coinResult').textContent = heads ? '正面：去做！✅' : '反面：再想想～ 🤔';
+      },1000);
+    }
+
+    // ===== 塔罗（3选1 + 逆位） =====
+    function openTarotModal(){
+      openModal('tarotModal');
+      const wrap=document.getElementById('tarotCards'); wrap.innerHTML=''; document.getElementById('tarotResult').style.display='none';
+      for(let i=0;i<3;i++){
+        const c=document.createElement('div');
+        c.className='tarot-card'; c.textContent='🔮';
+        c.addEventListener('click',()=>revealTarot(c,wrap));
+        wrap.appendChild(c);
+      }
+    }
+    function revealTarot(card, wrap){
+      [...wrap.children].forEach(n=>n.style.pointerEvents='none');
+      card.classList.add('flipped');
+      setTimeout(()=>{
+        const t = tarotData[Math.floor(Math.random()*tarotData.length)];
+        const reversed = Math.random()<0.5;
+        document.getElementById('tarotEmoji').textContent = t.emoji;
+        document.getElementById('tarotTitle').textContent = t.name + (reversed?'（逆位）':'');
+        document.getElementById('tarotDetail').textContent = reversed ? (`逆位提示：放慢脚步，梳理情绪再行动。— ${t.detail}`) : t.detail;
+        document.getElementById('tarotResult').style.display='block';
+      },300);
+    }
+
+    // ===== 能量充能 =====
+    function openEnergyModal(){ openModal('energyModal'); const f=document.getElementById('energyFill'); f.style.width='0%'; f.textContent='0%'; }
+    function chargeEnergy(){
+      const f=document.getElementById('energyFill'); let cur=0;
+      const target=70+Math.floor(Math.random()*31);
+      const id=setInterval(()=>{
+        cur=Math.min(target, cur + 5 + Math.floor(Math.random()*10));
+        f.style.width=cur+'%'; f.textContent=cur+'%';
+        if(cur>=target){ clearInterval(id); }
+      },120);
+    }
+
+    // ===== 许愿池 =====
+    function openWishModal(){ openModal('wishModal'); document.getElementById('wishText').value=''; document.getElementById('wishResult').textContent=''; }
+    function makeWish(){
+      const txt=document.getElementById('wishText').value.trim();
+      const r=document.getElementById('wishResult');
+      if(!txt){ r.textContent='写点什么吧～（愿望不能为空）'; return; }
+      state.last.wish = txt; saveState();
+      r.textContent='已投入许愿池！愿望正在宇宙排队实现中 ✨';
+      const cx=window.innerWidth/2, cy=window.innerHeight/2;
+      createParticles(cx,cy);
+    }
+
+    // ===== 星座/生肖 =====
+    function openZodiacModal(){
+      openModal('zodiacModal');
+      document.getElementById('signSel').value = state.profile.sign || '';
+      document.getElementById('zodiacSel').value = state.profile.zodiac || '';
+    }
+    function saveProfile(){
+      state.profile.sign = document.getElementById('signSel').value;
+      state.profile.zodiac = document.getElementById('zodiacSel').value;
+      saveState(); closeModal('zodiacModal');
+    }
+
+    // ===== 海报生成 =====
+    function openPosterModal(){ openModal('posterModal'); }
+    function wrapText(ctx, text, cx, y, maxWidth, lineHeight){
+      const words=[...text]; let line=''; let yy=y; ctx.textAlign='center';
+      words.forEach(ch=>{
+        const test=line+ch;
+        if(ctx.measureText(test).width>maxWidth){ ctx.fillText(line, cx, yy); line=ch; yy+=lineHeight; }
+        else { line=test; }
+      });
+      ctx.fillText(line, cx, yy);
+    }
+    function renderPoster(){
+      const cvs=document.getElementById('posterCanvas'); const ctx=cvs.getContext('2d'); const W=cvs.width, H=cvs.height;
+      ctx.clearRect(0,0,W,H);
+      const g=ctx.createLinearGradient(0,0,W,H); g.addColorStop(0,'#667eea'); g.addColorStop(.5,'#764ba2'); g.addColorStop(1,'#f093fb'); ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+      // 标题 & 日期
+      ctx.fillStyle='rgba(255,255,255,.95)'; ctx.font='bold 64px Arial'; ctx.textAlign='center'; ctx.fillText('好运喷雾', W/2, 120);
+      ctx.font='24px Arial'; ctx.fillText(new Date().toLocaleString(), W/2, 160);
+      // 运势
+      const f=state.last.fortune||{emoji:'✨',level:'尚未抽签',detail:'点击“今日运势”抽取吧～'};
+      ctx.font='56px Arial'; ctx.fillText(`${f.emoji} ${f.level}`, W/2, 250);
+      ctx.font='28px Arial'; wrapText(ctx, f.detail, W/2, 295, W-160, 34);
+      // 幸运色/方向
+      const lc=state.last.luckColor||{color:'未生成',dir:'—'};
+      ctx.font='32px Arial'; ctx.fillText(`🎨 ${lc.color} · ${lc.dir}`, W/2, 400);
+      // 幸运数字
+      ctx.font='28px Arial';
+      const nums = state.last.numbers && state.last.numbers.length ? state.last.numbers.join('  ') : '（尚未生成）';
+      ctx.fillText(`🎰 幸运数字：${nums}`, W/2, 450);
+      // 愿望
+      const wish = state.last.wish || '写下你的愿望吧～';
+      ctx.font='bold 36px Arial'; ctx.fillText('🌠 今日愿望', W/2, 520);
+      ctx.font='28px Arial'; wrapText(ctx, wish, W/2, 560, W-180, 34);
+      // 底部
+      ctx.font='22px Arial'; ctx.fillStyle='rgba(255,255,255,.9)'; ctx.fillText('Made with ❤️', W/2, H-60);
+    }
+    function downloadPoster(){
+      const a=document.createElement('a'); a.href=document.getElementById('posterCanvas').toDataURL('image/png'); a.download='好运海报.png'; a.click();
+    }
+
+    // ===== 入口函数别名（方便绑定） =====
+    function openFortuneModal(){ openModal('fortuneModal'); document.getElementById('fortuneCard').style.display='none'; }
+    function openLuckyNumberModal(){ openModal('luckyNumberModal'); document.getElementById('luckyNumbers').innerHTML=''; document.getElementById('luckyExtra').textContent=''; }
+    function openCoinModal(){ openModal('coinModal'); document.getElementById('coinResult').textContent=''; }
+    function openTarotModal(){ openModal('tarotModal'); const wrap = document.getElementById('tarotCards'); wrap.innerHTML=''; document.getElementById('tarotResult').style.display='none'; for(let i=0;i<3;i++){ const c=document.createElement('div'); c.className='tarot-card'; c.textContent='🔮'; c.addEventListener('click',()=>revealTarot(c,wrap)); wrap.appendChild(c);} }
+    function openEnergyModal(){ openModal('energyModal'); const f=document.getElementById('energyFill'); f.style.width='0%'; f.textContent='0%'; }
+    function openWishModal(){ openModal('wishModal'); document.getElementById('wishText').value=''; document.getElementById('wishResult').textContent=''; }
+    function openZodiacModal(){ openModal('zodiacModal'); document.getElementById('signSel').value=state.profile.sign||''; document.getElementById('zodiacSel').value=state.profile.zodiac||''; }
+    function openPosterModal(){ openModal('posterModal'); }
+  </script>
+</body>
+</html>
